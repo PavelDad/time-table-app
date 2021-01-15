@@ -1,7 +1,7 @@
 import React from 'react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {useRoutes} from "./routes";
-//import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 function App() {
     const routes = useRoutes(false)

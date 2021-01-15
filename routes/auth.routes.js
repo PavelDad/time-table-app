@@ -8,16 +8,12 @@ const router = Router()
 router.post('/register', async (req, res) => {
     try {
         const {login, password} = req.body
-        console.log('Body',`${login} ${password}`)
         const candidate = await User.findOne({ login })
-        console.log('candidate',`${candidate}`)
         if (candidate) {
             return res.status(400).json({ message: 'Пользователь уже существует.' })
         }
         const hashedPassword = await bcrypt.hash(password, 2)
-        console.log('hashedPassword',`${hashedPassword}`)
         const user = new User({ login, password: hashedPassword })
-        console.log('user',`${user}`)
         await user.save()
         res.status(201).json({ message: 'Пользователь создан' })
     } catch (e){
@@ -29,20 +25,23 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const {login, password} = req.body
+        console.log(req.body)
         const user = await User.findOne({ login })
+        console.log(user)
         if (!user) {
             return res.status(400).json({message: 'Неверный логин или пароль.'})
         }
         const isMatch = await bcrypt.compare(password, user.password)
+        console.log(isMatch)
         if (!isMatch){
             return res.status(400).json({message: 'Неверный логин или пароль.'})
         }
-        const token = jwt.sing(
-            { userId: user.id },
+        const token = jwt.sign(
+            { userId: user._id },
             config.get('jwtSecter'),
             { expiresIn: '1h' }
         )
-        res.json({ token, userId })
+        res.json({ token, userId: user._id })
     } catch (e){
         res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова.' })
     }
